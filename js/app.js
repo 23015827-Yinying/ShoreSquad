@@ -46,54 +46,100 @@ class ShoreSquad {
             // Handle error gracefully - we'll add error UI later
         }
     }    async getWeather() {
-        if (!this.userLocation) return;
-
         try {
-            // For demo purposes, we'll use a mock weather response
-            // In production, you would use a real weather API
-            const mockWeather = {
+            const today = new Date();
+            const formattedDate = today.toISOString().split('T')[0];
+            
+            // Fetch 24-hour weather forecast
+            const response = await fetch(`https://api.data.gov.sg/v1/environment/24-hour-weather-forecast?date=${formattedDate}`);
+            if (!response.ok) throw new Error('Weather forecast fetch failed');
+            const data = await response.json();
+            
+            // Fetch 4-day weather forecast
+            const fourDayResponse = await fetch(`https://api.data.gov.sg/v1/environment/4-day-weather-forecast?date=${formattedDate}`);
+            if (!fourDayResponse.ok) throw new Error('4-day forecast fetch failed');
+            const fourDayData = await fourDayResponse.json();
+
+            // Get current temperature readings
+            const tempResponse = await fetch(`https://api.data.gov.sg/v1/environment/air-temperature?date=${formattedDate}`);
+            if (!tempResponse.ok) throw new Error('Temperature fetch failed');
+            const tempData = await tempResponse.json();
+
+            // Check if we have valid data
+            if (!data.items || !data.items.length || !fourDayData.items || !fourDayData.items.length) {
+                throw new Error('No weather data available');
+            }
+
+            const weatherInfo = {
                 current: {
-                    temp: 25,
-                    humidity: 65,
-                    wind_speed: 12,
-                    weather: [{ description: 'Sunny with light clouds' }]
+                    forecast: data.items[0].general.forecast,
+                    temperature: this.findPasirRisTemperature(tempData),
+                    relative_humidity: data.items[0].general.relative_humidity,
+                    wind: data.items[0].general.wind
                 },
-                daily: [
-                    { temp: { day: 25 }, weather: [{ description: 'Sunny' }] },
-                    { temp: { day: 24 }, weather: [{ description: 'Partly cloudy' }] },
-                    { temp: { day: 23 }, weather: [{ description: 'Light rain' }] }
-                ]
+                fourDay: fourDayData.items[0].forecasts
             };
 
-            this.displayWeather(mockWeather);
+            this.displayWeather(weatherInfo);
         } catch (error) {
             console.error('Error fetching weather:', error);
             this.displayWeatherError();
         }
     }
 
-    displayWeather(data) {
+    findPasirRisTemperature(tempData) {
+        if (!tempData.items || !tempData.items.length) return null;
+        
+        // Find the Pasir Ris station reading (station_id might be different, adjust as needed)
+        const pasirRisReading = tempData.items[0].readings.find(
+            r => r.station_id === 'S50' || // Pasir Ris
+                 r.station_id === 'S104' || // Changi
+                 r.station_id === 'S107' // Tampines
+        );
+
+        return pasirRisReading ? pasirRisReading.value : null;
+    }    displayWeather(data) {
         const container = document.querySelector('.weather-container');
         if (!container) return;
 
+        const getWeatherIcon = (forecast) => {
+            const conditions = forecast.toLowerCase();
+            if (conditions.includes('thundery')) return '⛈️';
+            if (conditions.includes('rain')) return '🌧️';
+            if (conditions.includes('cloudy')) return '☁️';
+            if (conditions.includes('fair') || conditions.includes('sunny')) return '☀️';
+            if (conditions.includes('windy')) return '💨';
+            if (conditions.includes('showers')) return '🌦️';
+            return '🌤️';
+        };
+
         const html = `
             <div class="weather-current">
-                <h3>Current Weather</h3>
+                <h3>Current Weather at Pasir Ris</h3>
                 <div class="weather-details">
-                    <p class="temperature">${Math.round(data.current.temp)}°C</p>
-                    <p class="description">${data.current.weather[0].description}</p>
-                    <p class="humidity">Humidity: ${data.current.humidity}%</p>
-                    <p class="wind">Wind: ${Math.round(data.current.wind_speed)} km/h</p>
+                    <div class="current-conditions">
+                        <p class="temperature">${data.current.temperature ? data.current.temperature.toFixed(1) : '--'}°C</p>
+                        <p class="description">
+                            ${getWeatherIcon(data.current.forecast)} ${data.current.forecast}
+                        </p>
+                    </div>
+                    <div class="current-info">
+                        <p class="humidity">Humidity: ${data.current.relative_humidity.low}-${data.current.relative_humidity.high}%</p>
+                        <p class="wind">Wind: ${data.current.wind.speed.low}-${data.current.wind.speed.high} km/h</p>
+                    </div>
                 </div>
             </div>
             <div class="weather-forecast">
-                <h3>3-Day Forecast</h3>
+                <h3>4-Day Forecast</h3>
                 <div class="forecast-container">
-                    ${data.daily.slice(0, 3).map((day, index) => `
+                    ${data.fourDay.map(day => `
                         <div class="forecast-day">
-                            <p class="date">${new Date(Date.now() + (index + 1) * 86400000).toLocaleDateString('en-US', { weekday: 'short' })}</p>
-                            <p class="temperature">${Math.round(day.temp.day)}°C</p>
-                            <p class="description">${day.weather[0].description}</p>
+                            <p class="date">${new Date(day.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</p>
+                            <p class="weather-icon">${getWeatherIcon(day.forecast)}</p>
+                            <p class="temperature">${day.temperature.low}°C - ${day.temperature.high}°C</p>
+                            <p class="description">${day.forecast}</p>
+                            <p class="humidity">Humidity: ${day.relative_humidity.low}-${day.relative_humidity.high}%</p>
+                            <p class="wind">Wind: ${day.wind.speed.low}-${day.wind.speed.high} km/h</p>
                         </div>
                     `).join('')}
                 </div>
