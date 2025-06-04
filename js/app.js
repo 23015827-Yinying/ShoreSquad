@@ -61,21 +61,43 @@ class ShoreSquad {
         if (container) {
             container.innerHTML = '<div class="loading"></div>';
         }
-    }
-
-    setupNavigation() {
+    }    setupNavigation() {
         const menuToggle = document.querySelector('.menu-toggle');
         const navMenu = document.querySelector('.nav-menu');
 
         if (menuToggle && navMenu) {
+            // Toggle menu on button click
             menuToggle.addEventListener('click', () => {
+                const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
                 navMenu.classList.toggle('active');
-                menuToggle.setAttribute('aria-expanded', 
-                    menuToggle.getAttribute('aria-expanded') === 'true' ? 'false' : 'true'
-                );
+                menuToggle.setAttribute('aria-expanded', !isExpanded);
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!navMenu.contains(e.target) && !menuToggle.contains(e.target)) {
+                    navMenu.classList.remove('active');
+                    menuToggle.setAttribute('aria-expanded', 'false');
+                }
+            });
+
+            // Close menu when a link is clicked
+            navMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    navMenu.classList.remove('active');
+                    menuToggle.setAttribute('aria-expanded', 'false');
+                });
+            });
+
+            // Handle escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+                    navMenu.classList.remove('active');
+                    menuToggle.setAttribute('aria-expanded', 'false');
+                }
             });
         }
-    }    async getWeather() {
+    }async getWeather() {
         try {
             this.showLoading();
             

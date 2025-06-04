@@ -8,22 +8,18 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
 </head>
 <body>
-    <header class="main-header">
+    <a href="#main" class="skip-link">Skip to main content</a>    <header class="main-header">
         <nav class="nav-container">
-            <div class="logo">ShoreSquad</div>
-            <button class="menu-toggle" aria-label="Toggle navigation menu">
-                <span></span>
-            </button>
-            <ul class="nav-menu">
-                <li><a href="#map">Find Cleanups</a></li>
-                <li><a href="#weather">Weather</a></li>
-                <li><a href="#join">Join Squad</a></li>
+            <div class="logo" role="banner">ShoreSquad</div>
+            <ul class="nav-menu" id="nav-menu" role="navigation">
+                <li><a href="#map" aria-label="Find beach cleanup locations">Find Cleanups</a></li>
+                <li><a href="#weather" aria-label="Check beach weather forecast">Weather</a></li>
+                <li><a href="#join" aria-label="Join our cleanup squad">Join Squad</a></li>
             </ul>
         </nav>
     </header>
-
-    <main>
-        <section class="hero">
+    <main id="main" role="main">
+        <section class="hero" aria-label="Welcome section">
             <div class="hero-content">
                 <h1>Make Waves of Change</h1>
                 <p>Join the squad keeping our beaches clean</p>
@@ -55,12 +51,61 @@
                 <!-- Weather info will be displayed here -->
             </div>
         </section>
-    </main>
-
-    <footer>
-        <div class="footer-content">
-            <p>&copy; 2025 ShoreSquad. Making waves of change together.</p>
-        </div>    </footer>
+    </main>    <footer class="main-footer">
+        <div class="footer-grid">
+            <div class="footer-section">
+                <h3>About ShoreSquad</h3>
+                <p>Making waves of change together since 2025. Join our mission to keep Singapore's beaches clean and beautiful.</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#map">Find Cleanups</a></li>
+                    <li><a href="#weather">Weather Updates</a></li>
+                    <li><a href="#join">Join Squad</a></li>
+                    <li><a href="#about">About Us</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <ul>
+                    <li><a href="mailto:hello@shoresquad.sg">hello@shoresquad.sg</a></li>
+                    <li><a href="tel:+6591234567">+65 9123 4567</a></li>
+                    <li>123 Coastal Road</li>
+                    <li>Singapore 123456</li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="social-links">
+                    <a href="https://instagram.com/shoresquad" aria-label="Follow us on Instagram">
+                        <span class="social-icon">📸</span>
+                    </a>
+                    <a href="https://facebook.com/shoresquad" aria-label="Follow us on Facebook">
+                        <span class="social-icon">👥</span>
+                    </a>
+                    <a href="https://twitter.com/shoresquad" aria-label="Follow us on Twitter">
+                        <span class="social-icon">🐦</span>
+                    </a>
+                    <a href="https://linkedin.com/company/shoresquad" aria-label="Follow us on LinkedIn">
+                        <span class="social-icon">💼</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 ShoreSquad. All rights reserved.</p>
+            <div class="footer-legal">
+                <a href="/privacy">Privacy Policy</a>
+                <a href="/terms">Terms of Service</a>
+                <a href="/sitemap">Sitemap</a>
+            </div>
+        </div>
+    </footer>
     <script src="js/app.js"></script>
     <!--Start of Tawk.to Script-->
     <script type="text/javascript">
