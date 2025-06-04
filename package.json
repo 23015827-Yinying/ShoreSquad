@@ -1,7 +1,7 @@
 {
-  "name": "dev-c240",
+  "name": "shoresquad",
   "version": "1.0.0",
-  "description": "",
+  "description": "Rally your crew, track weather, and hit the next beach cleanup with our dope map app!",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
