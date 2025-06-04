@@ -135,25 +135,15 @@ class ShoreSquad {
 
         // Add some sample cleanup events
         this.addSampleCleanupEvents();
-    }
-
-    addSampleCleanupEvents() {
+    }    addSampleCleanupEvents() {
         const sampleEvents = [
             {
                 id: 'event1',
-                lat: this.userLocation.latitude + 0.01,
-                lng: this.userLocation.longitude + 0.01,
-                title: 'Weekend Beach Cleanup',
+                lat: 1.381497,
+                lng: 103.955574,
+                title: 'Pasir Ris Beach Cleanup',
                 date: '2025-06-08',
-                participants: 12
-            },
-            {
-                id: 'event2',
-                lat: this.userLocation.latitude - 0.01,
-                lng: this.userLocation.longitude - 0.01,
-                title: 'Coastal Crew Meetup',
-                date: '2025-06-15',
-                participants: 8
+                participants: 15
             }
         ];
 
