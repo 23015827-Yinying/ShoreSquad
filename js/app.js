@@ -1,18 +1,66 @@
 // ShoreSquad App
 class ShoreSquad {
     constructor() {
-        this.map = null;
-        this.markers = new Map();
-        this.cleanupEvents = new Map();
+        this.MOCK_WEATHER_DATA = {
+            current: {
+                date: "2025-06-04",
+                temperature: 29.5,
+                forecast: "Partly Cloudy",
+                relative_humidity: { low: 65, high: 75 },
+                wind: { speed: { low: 15, high: 25 }, direction: "NE" }
+            },
+            fourDay: [
+                {
+                    date: "2025-06-05",
+                    forecast: "Afternoon Thunderstorms",
+                    temperature: { low: 26, high: 32 },
+                    relative_humidity: { low: 70, high: 90 },
+                    wind: { speed: { low: 10, high: 20 } }
+                },
+                {
+                    date: "2025-06-06",
+                    forecast: "Light Rain",
+                    temperature: { low: 25, high: 31 },
+                    relative_humidity: { low: 75, high: 85 },
+                    wind: { speed: { low: 15, high: 25 } }
+                },
+                {
+                    date: "2025-06-07",
+                    forecast: "Fair and Warm",
+                    temperature: { low: 27, high: 33 },
+                    relative_humidity: { low: 60, high: 80 },
+                    wind: { speed: { low: 10, high: 20 } }
+                },
+                {
+                    date: "2025-06-08",
+                    forecast: "Sunny",
+                    temperature: { low: 26, high: 32 },
+                    relative_humidity: { low: 65, high: 75 },
+                    wind: { speed: { low: 12, high: 22 } }
+                }
+            ]
+        };
+        
         this.initializeApp();
     }
 
     async initializeApp() {
         this.setupNavigation();
-        await this.setupGeolocation();
-        this.initMap();
-        await this.getWeather();
         this.setupEventListeners();
+        
+        // Show loading state
+        this.showLoading();
+        
+        // Simulate API delay with mock data
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        await this.getWeather();
+    }
+
+    showLoading() {
+        const container = document.querySelector('.weather-container');
+        if (container) {
+            container.innerHTML = '<div class="loading"></div>';
+        }
     }
 
     setupNavigation() {
@@ -27,60 +75,15 @@ class ShoreSquad {
                 );
             });
         }
-    }
-
-    async setupGeolocation() {
-        try {
-            if ('geolocation' in navigator) {
-                const position = await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject);
-                });
-
-                const { latitude, longitude } = position.coords;
-                // We'll use these coordinates for the map and weather features
-                this.userLocation = { latitude, longitude };
-                console.log('Location acquired:', this.userLocation);
-            }
-        } catch (error) {
-            console.error('Error getting location:', error);
-            // Handle error gracefully - we'll add error UI later
-        }
     }    async getWeather() {
         try {
-            const today = new Date();
-            const formattedDate = today.toISOString().split('T')[0];
+            this.showLoading();
             
-            // Fetch 24-hour weather forecast
-            const response = await fetch(`https://api.data.gov.sg/v1/environment/24-hour-weather-forecast?date=${formattedDate}`);
-            if (!response.ok) throw new Error('Weather forecast fetch failed');
-            const data = await response.json();
+            // Simulate API delay with mock data for Week 2
+            await new Promise(resolve => setTimeout(resolve, 1000));
             
-            // Fetch 4-day weather forecast
-            const fourDayResponse = await fetch(`https://api.data.gov.sg/v1/environment/4-day-weather-forecast?date=${formattedDate}`);
-            if (!fourDayResponse.ok) throw new Error('4-day forecast fetch failed');
-            const fourDayData = await fourDayResponse.json();
-
-            // Get current temperature readings
-            const tempResponse = await fetch(`https://api.data.gov.sg/v1/environment/air-temperature?date=${formattedDate}`);
-            if (!tempResponse.ok) throw new Error('Temperature fetch failed');
-            const tempData = await tempResponse.json();
-
-            // Check if we have valid data
-            if (!data.items || !data.items.length || !fourDayData.items || !fourDayData.items.length) {
-                throw new Error('No weather data available');
-            }
-
-            const weatherInfo = {
-                current: {
-                    forecast: data.items[0].general.forecast,
-                    temperature: this.findPasirRisTemperature(tempData),
-                    relative_humidity: data.items[0].general.relative_humidity,
-                    wind: data.items[0].general.wind
-                },
-                fourDay: fourDayData.items[0].forecasts
-            };
-
-            this.displayWeather(weatherInfo);
+            // Use mock data for now - will be replaced with real API in Week 3
+            this.displayWeather(this.MOCK_WEATHER_DATA);
         } catch (error) {
             console.error('Error fetching weather:', error);
             this.displayWeatherError();
@@ -154,7 +157,10 @@ class ShoreSquad {
         if (container) {
             container.innerHTML = `
                 <div class="weather-error">
-                    <p>Unable to load weather data. Please try again later.</p>
+                    <p>🌥️ Unable to load weather data. Please try again later.</p>
+                    <button onclick="window.shoreSquad.getWeather()" class="cta-button">
+                        Retry
+                    </button>
                 </div>
             `;
         }
